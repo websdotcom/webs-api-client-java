@@ -3,10 +3,15 @@ package com.webs.api.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 
 /**
  * @author Patrick Carroll
  */
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class App implements Serializable {
 	private Long id;
 
@@ -14,14 +19,17 @@ public class App implements Serializable {
 
 	private String name;
 
+	// XXX it can't seem to bind date objects right
 	private Date releaseDate;
 
 	private String description;
 
 	private String category;
 
+	@JsonProperty("developer_name")
 	private String developerName;
 
+	@JsonProperty("developer_url")
 	private String developerUrl;
 
 
