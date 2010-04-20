@@ -29,8 +29,9 @@ public class AppApiTest {
 
 	@Test
 	public void getAllApps() {
-		//List<App> apps = client.getAllApps();
-		//assertNotNull(apps);
+		List<App> apps = client.getAllApps();
+		assertNotNull(apps);
+		assertFalse(apps.isEmpty());
 	}
 
 	@Test
