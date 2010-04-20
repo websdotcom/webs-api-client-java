@@ -99,4 +99,10 @@ public class App implements Serializable {
 	public void setDeveloperUrl(String developerUrl) {
 		this.developerUrl = developerUrl;
 	}
+
+
+	@Override
+	public String toString() {
+		return getName();
+	}
 }
