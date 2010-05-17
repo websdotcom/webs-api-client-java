@@ -6,9 +6,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.SimpleHttpConnectionManager;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.*;
@@ -19,6 +27,8 @@ import com.webs.api.exception.HttpApiException;
 import com.webs.api.exception.UsageErrorApiException;
 import com.webs.api.exception.WebsApiException;
 import com.webs.api.model.App;
+import com.webs.api.model.Sidebar;
+import com.webs.api.model.WebsID;
 
 
 /**
@@ -27,9 +37,17 @@ import com.webs.api.model.App;
 public class WebsApiClient implements AppApi {
 	private static final Log log = LogFactory.getLog(WebsApiClient.class);
 
+	private static final int CONNECTION_TIMEOUT = 5000;
+
+	private static final int SOCKET_TIMEOUT = 10000;
+
 	private String apiPath = "http://127.0.0.1:8080/webs-api/";
 	
 	private ObjectMapper jsonMapper = new ObjectMapper();
+
+	private boolean isAuthenticated = false;
+
+	private String accessToken = null;
 
 
 	public WebsApiClient() {
@@ -51,13 +69,27 @@ public class WebsApiClient implements AppApi {
 		return apiPath;
 	}
 
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
+
+	public String getAccessToken() {
+		return accessToken;
+	}
+
+	public String getOAuthAuthorizationUrl() {
+		// XXX since they're going to be entering their password here,
+		// can this be https://?
+		return "http://local.members.webs.com:8080/webs-api/oauth/authorize";
+	}
+
 
 	/**
 	 * Get all publicly available apps
 	 */
 	public List<App> getAllApps() {
 		try {
-			String data = apiHttpGet(getApiPath() + "apps/");
+			String data = httpRequest(new GetMethod(getApiPath() + "apps/"));
 			return jsonMapper.readValue(data, new TypeReference<List<App>>() { });
 		} catch (IOException e) {
 			log.fatal("Error converting JSON to List<App>: " + e);
@@ -70,7 +102,7 @@ public class WebsApiClient implements AppApi {
 	 */
 	public App getApp(final Long appId) {
 		try {
-			String data = apiHttpGet(getApiPath() + "apps/" + appId + "/");
+			String data = httpRequest(new GetMethod(getApiPath() + "apps/" + appId + "/"));
 			return jsonMapper.readValue(data, App.class);
 		} catch (IOException e) {
 			log.fatal("Error converting JSON to App: " + e);
@@ -83,7 +115,7 @@ public class WebsApiClient implements AppApi {
 	 */
 	public List<App> getApps(final Long siteId) {
 		try {
-			String data = apiHttpGet(getApiPath() + "sites/" + siteId + "/apps/");
+			String data = httpRequest(new GetMethod(getApiPath() + "sites/" + siteId + "/apps/"));
 			return jsonMapper.readValue(data, new TypeReference<List<App>>() { });
 		} catch (IOException e) {
 			log.fatal("Error converting JSON to List<App>: " + e);
@@ -95,23 +127,41 @@ public class WebsApiClient implements AppApi {
 	 * Install the given app on the given site
 	 */
 	public void installApp(final Long appId, final Long siteId) {
+		PostMethod post = new PostMethod(apiPath + "site/" + siteId + "/apps/");
+		NameValuePair[] data = {
+			new NameValuePair("id", appId.toString()),
+		};
+		post.setRequestBody(data);
+
+		httpRequest(post, HttpStatus.SC_CREATED);
 	}
 
 	/**
 	 * Install the given app on the given site
 	 */
 	public void uninstallApp(final Long appId, final Long siteId) {
+		httpRequest(new DeleteMethod(apiPath + "site/" + siteId + "/apps/" + appId));
 	}
 
 
-	protected String apiHttpGet(String url) {
-		HttpClient client = new HttpClient();
+	protected String httpRequest(HttpMethod method) {
+		return httpRequest(method, HttpStatus.SC_OK);
+	}
 
-		GetMethod method = new GetMethod(url);
+	protected String httpRequest(HttpMethod method, int expectedStatus) {
+		HttpConnectionManager connectionManager = new SimpleHttpConnectionManager(true);
+		HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+		params.setConnectionTimeout(CONNECTION_TIMEOUT);
+		params.setSoTimeout(SOCKET_TIMEOUT);
+		connectionManager.setParams(params);
+
+		HttpClient client = new HttpClient(connectionManager);
+		method.addRequestHeader("Accept", "application/json");
+
 		try {
 			int statusCode = client.executeMethod(method);
 
-			if (statusCode != HttpStatus.SC_OK)
+			if (statusCode != expectedStatus)
 				throw new HttpApiException("" + statusCode);
 
 			InputStream stream = method.getResponseBodyAsStream();
