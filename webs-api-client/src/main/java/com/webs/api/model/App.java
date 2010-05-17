@@ -36,6 +36,7 @@ public class App implements Serializable {
 	public App() {
 	}
 
+
 	public Long getId() {
 		return id;
 	}
