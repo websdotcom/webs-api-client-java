@@ -45,8 +45,6 @@ public class WebsApiClient implements AppApi {
 	
 	private ObjectMapper jsonMapper = new ObjectMapper();
 
-	private boolean isAuthenticated = false;
-
 	private String accessToken = null;
 
 
@@ -55,9 +53,9 @@ public class WebsApiClient implements AppApi {
 		// date format
 	}
 
-	public WebsApiClient(String apiPath) {
+	public WebsApiClient(String accessToken) {
 		super();
-		setApiPath(apiPath);
+		setAccessToken(accessToken);
 	}
 
 
@@ -78,9 +76,7 @@ public class WebsApiClient implements AppApi {
 	}
 
 	public String getOAuthAuthorizationUrl() {
-		// XXX since they're going to be entering their password here,
-		// can this be https://?
-		return "http://local.members.webs.com:8080/webs-api/oauth/authorize";
+		return "https://api.members.webs.com/oauth/authorize";
 	}
 
 
@@ -157,6 +153,10 @@ public class WebsApiClient implements AppApi {
 
 		HttpClient client = new HttpClient(connectionManager);
 		method.addRequestHeader("Accept", "application/json");
+
+		if (accessToken != null) 
+			method.addRequestHeader("Authorization", 
+					"Token token=\"" + accessToken + "\"");
 
 		try {
 			int statusCode = client.executeMethod(method);
