@@ -4,7 +4,7 @@
 	<groupId>com.webs.api</groupId>
 	<artifactId>webs-api-client</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<name>webs-api-client</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
@@ -53,4 +53,20 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+		<repository>
+			<id>nexus</id>
+			<name>Webs Nexus Repository</name>
+			<!-- TODO use hostname instead of ip address for server url value -->
+			<url>http://10.1.0.4:9999/nexus/content/repositories/releases</url>
+			<uniqueVersion>false</uniqueVersion>
+		</repository>
+		<snapshotRepository>
+			<id>nexus</id>
+			<name>Webs Nexus Repository</name>
+			<!-- TODO use hostname instead of ip address for server url value -->
+			<url>http://10.1.0.4:9999/nexus/content/repositories/snapshots</url>
+			<uniqueVersion>true</uniqueVersion>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
