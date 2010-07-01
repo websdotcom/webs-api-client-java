@@ -19,6 +19,10 @@ public interface MemberApi {
 
 	public void updateMember(final WebsID member, final Long siteId);
 
+	public void updateMemberStatus(final Long memberId, final Long siteId, final String status); 
+
+	public void clearMemberStatus(final Long memberId, final Long siteId); 
+
 	public void leaveSite(final Long memberId, final Long siteId);
 
 	public List<WebsID> getFriends(final Long memberId, final Long siteId);

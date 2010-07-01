@@ -34,7 +34,7 @@ import com.webs.api.model.WebsID;
 /**
  * @author Patrick Carroll
  */
-public class WebsApiClient implements AppApi {
+public class WebsApiClient implements AppApi, MemberApi {
 	private static final Log log = LogFactory.getLog(WebsApiClient.class);
 
 	private static final int CONNECTION_TIMEOUT = 5000;
@@ -60,6 +60,12 @@ public class WebsApiClient implements AppApi {
 
 
 	public void setApiPath(String apiPath) {
+		if (!apiPath.startsWith("https://"))
+			log.warn("Attempting to use non-SSL API path.");
+
+		if (!apiPath.endsWith("/"))
+			apiPath = apiPath + "/";
+
 		this.apiPath = apiPath;
 	}
 
@@ -123,7 +129,7 @@ public class WebsApiClient implements AppApi {
 	 * Install the given app on the given site
 	 */
 	public void installApp(final Long appId, final Long siteId) {
-		PostMethod post = new PostMethod(apiPath + "site/" + siteId + "/apps/");
+		PostMethod post = new PostMethod(apiPath + "sites/" + siteId + "/apps/");
 		NameValuePair[] data = {
 			new NameValuePair("id", appId.toString()),
 		};
@@ -136,7 +142,62 @@ public class WebsApiClient implements AppApi {
 	 * Install the given app on the given site
 	 */
 	public void uninstallApp(final Long appId, final Long siteId) {
-		httpRequest(new DeleteMethod(apiPath + "site/" + siteId + "/apps/" + appId));
+		httpRequest(new DeleteMethod(apiPath + "sites/" + siteId + "/apps/" + appId));
+	}
+
+
+
+	public List<WebsID> getMembers(final Long siteId) {
+		try {
+			String data = httpRequest(new GetMethod(getApiPath() + "sites/" + siteId + "/members/"));
+			return jsonMapper.readValue(data, new TypeReference<List<WebsID>>() { });
+		} catch (IOException e) {
+			log.fatal("Error converting JSON to List<App>: " + e);
+			return null;
+		}
+	}
+
+	public WebsID joinSite(final WebsID member, final Long siteId) {
+		return null;
+	}
+
+	public WebsID getMember(final Long memberId, final Long siteId) {
+		try {
+			String data = httpRequest(new GetMethod(getApiPath() + "sites/" + siteId + "/members/" + memberId + "/"));
+			return jsonMapper.readValue(data, WebsID.class);
+		} catch (IOException e) {
+			log.fatal("Error converting JSON to WebsID: " + e);
+			return null;
+		}
+	}
+
+	public void updateMember(final WebsID member, final Long siteId) {
+		try {
+			PutMethod put = new PutMethod(apiPath + "sites/" + siteId + "/members/" + member.getId() + "/");
+			put.setRequestBody(jsonMapper.writeValueAsString(member));
+
+			httpRequest(put, HttpStatus.SC_NO_CONTENT);
+		} catch (IOException e) {
+			log.fatal("Error converting JSON to WebsID: " + e);
+		}
+	}
+
+	public void updateMemberStatus(final Long memberId, final Long siteId, final String status) {
+		WebsID member = getMember(memberId, siteId);
+		member.setStatus(status);
+		updateMember(member, siteId);
+	}
+
+	public void clearMemberStatus(final Long memberId, final Long siteId) {
+		updateMemberStatus(memberId, siteId, null);
+	}
+
+	public void leaveSite(final Long memberId, final Long siteId) {
+		return;
+	}
+
+	public List<WebsID> getFriends(final Long memberId, final Long siteId) {
+		return null;
 	}
 
 
@@ -153,6 +214,7 @@ public class WebsApiClient implements AppApi {
 
 		HttpClient client = new HttpClient(connectionManager);
 		method.addRequestHeader("Accept", "application/json");
+		method.addRequestHeader("Content-Type", "application/json");
 
 		if (accessToken != null) 
 			method.addRequestHeader("Authorization", 
@@ -163,6 +225,9 @@ public class WebsApiClient implements AppApi {
 
 			if (statusCode != expectedStatus)
 				throw new HttpApiException("" + statusCode);
+
+			if (statusCode == HttpStatus.SC_NO_CONTENT)
+				return null;
 
 			InputStream stream = method.getResponseBodyAsStream();
 
