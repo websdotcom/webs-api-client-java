@@ -28,37 +28,56 @@ import com.webs.api.exception.UsageErrorApiException;
 import com.webs.api.exception.WebsApiException;
 import com.webs.api.model.App;
 import com.webs.api.model.Sidebar;
+import com.webs.api.model.Site;
 import com.webs.api.model.WebsID;
 
 
 /**
+ * Simple API client for use with the Webs.com REST API.  Using JSON as the
+ * data format, this class is responsible for marshalling domain-specific
+ * objects to/from JSON in communication with the API server.  Most methods
+ * which modify data will need an OAuth access token passed through the
+ * constructor.
+ *  
  * @author Patrick Carroll
  */
-public class WebsApiClient implements AppApi, MemberApi {
+public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 	private static final Log log = LogFactory.getLog(WebsApiClient.class);
 
 	private static final int CONNECTION_TIMEOUT = 5000;
 
 	private static final int SOCKET_TIMEOUT = 10000;
 
-	private String apiPath = "http://127.0.0.1:8080/webs-api/";
+	private String apiPath = "http://api1/"; // XXX need DNS for this
 	
 	private ObjectMapper jsonMapper = new ObjectMapper();
 
 	private String accessToken = null;
 
 
+	/**
+	 * Create an API client without an OAuth access token
+	 */
 	public WebsApiClient() {
 		// XXX can use a SerializationConfig object to configure the 
 		// date format
 	}
 
+	/**
+	 * Create an API client with the given OAuth access token
+	 *
+	 * @param accessToken	The access token provided by the Webs.com platform
+	 */
 	public WebsApiClient(String accessToken) {
 		super();
 		setAccessToken(accessToken);
 	}
 
 
+	/**
+	 * Set the location of the API server.  This location should be an
+	 * HTTPS compatible URL (i.e., start with <tt>https://</tt>.
+	 */
 	public void setApiPath(String apiPath) {
 		if (!apiPath.startsWith("https://"))
 			log.warn("Attempting to use non-SSL API path.");
@@ -69,25 +88,38 @@ public class WebsApiClient implements AppApi, MemberApi {
 		this.apiPath = apiPath;
 	}
 
+	/**
+	 * Get the location of the API server where requests are made.
+	 */
 	public String getApiPath() {
 		return apiPath;
 	}
 
+	/**
+	 * Set the OAuth access token which will be sent to the Webs.com API
+	 * server
+	 */
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
 	}
 
+	/**
+	 * Get the OAuth access token that is actively being used.
+	 */
 	public String getAccessToken() {
 		return accessToken;
 	}
 
+	/**
+	 * Get the URL used for requesting OAuth authorization
+	 */
 	public String getOAuthAuthorizationUrl() {
 		return "https://api.members.webs.com/oauth/authorize";
 	}
 
 
 	/**
-	 * Get all publicly available apps
+	 * {@inheritDoc}
 	 */
 	public List<App> getAllApps() {
 		try {
@@ -100,7 +132,7 @@ public class WebsApiClient implements AppApi, MemberApi {
 	}
 
 	/**
-	 * Get the app corresponding to the given appId
+	 * {@inheritDoc}
 	 */
 	public App getApp(final Long appId) {
 		try {
@@ -113,7 +145,7 @@ public class WebsApiClient implements AppApi, MemberApi {
 	}
 
 	/**
-	 * Get all currently installed apps on the given site
+	 * {@inheritDoc}
 	 */
 	public List<App> getApps(final Long siteId) {
 		try {
@@ -126,7 +158,7 @@ public class WebsApiClient implements AppApi, MemberApi {
 	}
 
 	/**
-	 * Install the given app on the given site
+	 * {@inheritDoc}
 	 */
 	public void installApp(final Long appId, final Long siteId) {
 		PostMethod post = new PostMethod(apiPath + "sites/" + siteId + "/apps/");
@@ -139,7 +171,7 @@ public class WebsApiClient implements AppApi, MemberApi {
 	}
 
 	/**
-	 * Install the given app on the given site
+	 * {@inheritDoc}
 	 */
 	public void uninstallApp(final Long appId, final Long siteId) {
 		httpRequest(new DeleteMethod(apiPath + "sites/" + siteId + "/apps/" + appId));
@@ -201,6 +233,50 @@ public class WebsApiClient implements AppApi, MemberApi {
 	}
 
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public Site getSite(final Long siteId) {
+		return getSite(siteId.toString());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Site getSite(final String username) {
+		try {
+			String data = httpRequest(new GetMethod(getApiPath() + "sites/" + username));
+			return jsonMapper.readValue(data, Site.class);
+		} catch (IOException e) {
+			log.fatal("Error converting JSON to Site: " + e);
+			return null;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void updateSite(final Site site) {
+		String identifier;
+		if (site.getId() != null) {
+			identifier = site.getId().toString();
+		} else if (site.getUsername() != null) {
+			identifier = site.getUsername().toString();
+		} else {
+			log.fatal("updateSite requires either site.id or site.username to be set");
+			return;
+		}
+
+		try {
+			PutMethod put = new PutMethod(apiPath + "sites/" + identifier);
+			put.setRequestBody(jsonMapper.writeValueAsString(site));
+			httpRequest(put, HttpStatus.SC_NO_CONTENT);
+		} catch (IOException e) {
+			log.fatal("Error converting JSON to WebsID: " + e);
+		}
+	}
+
+
 	protected String httpRequest(HttpMethod method) {
 		return httpRequest(method, HttpStatus.SC_OK);
 	}
@@ -244,13 +320,11 @@ public class WebsApiClient implements AppApi, MemberApi {
 		throw new HttpApiException("No content received from server");
 	}
 
-	// XXX it's stupid that this parses JSON but returns a String
-	// representing the content of the message which has already been parsed
 	protected String extractContent(InputStream json) throws IOException {
 		JsonNode rootNode = jsonMapper.readValue(json, JsonNode.class);
-		if (!rootNode.path("success").getBooleanValue()) 
+		if (rootNode.get("success") != null && !rootNode.path("success").getBooleanValue()) 
 			throw new UsageErrorApiException(rootNode.path("message").getValueAsText());
 
-		return rootNode.path("content").toString();
+		return rootNode.toString();
 	}
 }

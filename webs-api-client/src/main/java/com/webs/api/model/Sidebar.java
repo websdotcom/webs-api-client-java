@@ -9,6 +9,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * @author Patrick Carroll
  */
 public class Sidebar implements Serializable {
+	private static long serialVersionUID = 1L;
+
 	private Long id;
 
 	private String title;
