@@ -43,7 +43,10 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 		((HttpApiClientAware)appApi).setHttpApiClient(httpApiClient);
 
 		this.memberApi = new MemberApiImpl();
+		((HttpApiClientAware)memberApi).setHttpApiClient(httpApiClient);
+
 		this.siteApi = new SiteApiImpl();
+		((HttpApiClientAware)siteApi).setHttpApiClient(httpApiClient);
 	}
 
 	/**
