@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.webs.api.model.App;
+import com.webs.api.model.id.AppId;
+import com.webs.api.model.id.SiteId;
 
 
 /**
@@ -36,14 +38,14 @@ public class AppApiTest {
 
 	@Test
 	public void getApp() {
-		App app = client.getApp(TEST_APP_ID);
+		App app = client.getApp(new AppId(TEST_APP_ID));
 		assertNotNull(app);
 		assertEquals("photos", app.getHandle());
 	}
 
 	@Test
 	public void getApps() {
-		List<App> apps = client.getApps(TEST_SITE_ID);
+		List<App> apps = client.getApps(new SiteId(TEST_SITE_ID));
 	}
 
 	@Test

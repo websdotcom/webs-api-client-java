@@ -9,6 +9,7 @@ import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import org.codehaus.jackson.type.TypeReference;
 
 import com.webs.api.http.AbstractHttpApiClientAware;
 import com.webs.api.model.Site;

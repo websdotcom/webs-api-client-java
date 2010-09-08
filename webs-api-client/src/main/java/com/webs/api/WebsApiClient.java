@@ -9,6 +9,8 @@ import com.webs.api.model.Sidebar;
 import com.webs.api.model.Site;
 import com.webs.api.model.SiteSubscription;
 import com.webs.api.model.WebsID;
+import com.webs.api.model.id.AppId;
+import com.webs.api.model.id.SiteId;
 
 
 /**
@@ -92,24 +94,42 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 	}
 
 
-	// app api methods
+	/**
+	 * Get all publicly available apps
+	 *
+	 * @return	A list of all publicly available apps on Webs.com
+	 */
 	public List<App> getAllApps() {
 		return appApi.getAllApps();
 	}
 
-	public App getApp(final Long appId) {
+	/**
+	 * Get the app corresponding to the given appId
+	 *
+	 * @param appId	The id of the corresponding app
+	 *
+	 * @return The app that was found or null if none are found
+	 */
+	public App getApp(final AppId appId) {
 		return appApi.getApp(appId);
 	}
 
-	public List<App> getApps(final Long siteId) {
+	/**
+	 * Get all publicly installed apps on the site corresponding to siteId
+	 *
+	 * @param siteId	The unique id corresponding to the site
+	 *
+	 * @return A list of all publicly available apps
+	 */
+	public List<App> getApps(final SiteId siteId) {
 		return appApi.getApps(siteId);
 	}
 
-	public void installApp(final Long appId, final Long siteId) {
+	public void installApp(final AppId appId, final SiteId siteId) {
 		appApi.installApp(appId, siteId);
 	}
 
-	public void uninstallApp(final Long appId, final Long siteId) {
+	public void uninstallApp(final AppId appId, final SiteId siteId) {
 		appApi.uninstallApp(appId, siteId);
 	}
 

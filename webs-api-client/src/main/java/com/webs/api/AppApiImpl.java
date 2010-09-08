@@ -13,6 +13,8 @@ import org.codehaus.jackson.type.TypeReference;
 
 import com.webs.api.http.AbstractHttpApiClientAware;
 import com.webs.api.model.App;
+import com.webs.api.model.id.AppId;
+import com.webs.api.model.id.SiteId;
 
 
 /**
@@ -34,11 +36,13 @@ public class AppApiImpl extends AbstractHttpApiClientAware implements AppApi {
 		}
 	}
 
-	public App getApp(final Long appId) {
+	public App getApp(final AppId appId) {
+		String app = appId.toString();
+
 		try {
 			String data = httpApiClient.httpRequest(
 					new GetMethod(httpApiClient.getApiPath() + "apps/" 
-						+ appId + "/"));
+						+ app + "/"));
 			return jsonMapper.readValue(data, App.class);
 		} catch (IOException e) {
 			log.fatal("Error converting JSON to App: " + e);
@@ -46,11 +50,13 @@ public class AppApiImpl extends AbstractHttpApiClientAware implements AppApi {
 		}
 	}
 
-	public List<App> getApps(final Long siteId) {
+	public List<App> getApps(final SiteId siteId) {
+		String site = siteId.toString();
+
 		try {
 			String data = httpApiClient.httpRequest(
 					new GetMethod(httpApiClient.getApiPath() + "sites/" 
-						+ siteId + "/apps/"));
+						+ site + "/apps/"));
 			return jsonMapper.readValue(data, new TypeReference<List<App>>() { });
 		} catch (IOException e) {
 			log.fatal("Error converting JSON to List<App>: " + e);
@@ -58,12 +64,22 @@ public class AppApiImpl extends AbstractHttpApiClientAware implements AppApi {
 		}
 	}
 
-	public void installApp(final Long appId, final Long siteId) {
+	public void installApp(final AppId appId, final SiteId siteId) {
+		String app = appId.toString();
+
 		PostMethod post = new PostMethod(httpApiClient.getApiPath() 
-				+ "sites/" + siteId + "/apps/");
+				+ "sites/" + siteId.toString() + "/apps/");
+
+		String key = "id";
+
+		try {
+			Long.parseLong(app);
+		} catch (NumberFormatException e) {
+			key = "handle";
+		}
 
 		NameValuePair[] data = {
-			new NameValuePair("id", appId.toString()),
+			new NameValuePair(key, app),
 		};
 
 		post.setRequestBody(data);
@@ -71,8 +87,9 @@ public class AppApiImpl extends AbstractHttpApiClientAware implements AppApi {
 		httpApiClient.httpRequest(post, HttpStatus.SC_CREATED);
 	}
 
-	public void uninstallApp(final Long appId, final Long siteId) {
+	public void uninstallApp(final AppId appId, final SiteId siteId) {
 		httpApiClient.httpRequest(
-				new DeleteMethod(httpApiClient.getApiPath() + "sites/" + siteId + "/apps/" + appId));
+				new DeleteMethod(httpApiClient.getApiPath() + "sites/" 
+					+ siteId.toString() + "/apps/" + appId.toString()));
 	}
 }
