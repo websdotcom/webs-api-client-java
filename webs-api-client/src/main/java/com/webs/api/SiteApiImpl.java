@@ -13,6 +13,7 @@ import org.codehaus.jackson.type.TypeReference;
 
 import com.webs.api.http.AbstractHttpApiClientAware;
 import com.webs.api.model.Site;
+import com.webs.api.model.id.SiteId;
 
 
 /**
@@ -23,15 +24,11 @@ public class SiteApiImpl extends AbstractHttpApiClientAware implements SiteApi {
 	}
 
 
-	public Site getSite(final Long siteId) {
-		return getSite(siteId.toString());
-	}
-
-	public Site getSite(final String username) {
+	public Site getSite(final SiteId siteId) {
 		try {
 			String data = httpApiClient.httpRequest(
 					new GetMethod(httpApiClient.getApiPath() + "sites/" 
-						+ username));
+						+ siteId.toString()));
 			return jsonMapper.readValue(data, Site.class);
 		} catch (IOException e) {
 			log.fatal("Error converting JSON to Site: " + e);

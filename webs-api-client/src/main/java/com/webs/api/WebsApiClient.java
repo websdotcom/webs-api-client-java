@@ -174,12 +174,8 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 
 
 	// site api methods
-	public Site getSite(final Long siteId) {
+	public Site getSite(final SiteId siteId) {
 		return siteApi.getSite(siteId);
-	}
-
-	public Site getSite(final String username) {
-		return siteApi.getSite(username);
 	}
 
 	public void updateSite(final Site site) {

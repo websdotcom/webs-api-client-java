@@ -1,6 +1,7 @@
 package com.webs.api;
 
 import com.webs.api.model.Site;
+import com.webs.api.model.id.SiteId;
 
 
 /**
@@ -16,16 +17,7 @@ public interface SiteApi {
 	 *
 	 * @return The site or null if not found
 	 */
-	public Site getSite(final Long siteId);
-
-	/**
-	 * Looks up a {@link Site} object given the username of that site.
-	 *
-	 * @param username	The username associated with the site 
-	 *
-	 * @return The site or null if not found
-	 */
-	public Site getSite(final String username);
+	public Site getSite(final SiteId siteId);
 
 	/**
 	 * Update the given site object.  The supplied site object must have
