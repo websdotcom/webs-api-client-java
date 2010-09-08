@@ -6,6 +6,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertTrue;
 
 import com.webs.api.model.Site;
+import com.webs.api.model.id.SiteId;
 
 
 /**
@@ -23,13 +24,13 @@ public class WebsApiClientTest {
 
 	@Test
 	public void getSite() {
-		Site site = client.getSite(31515461L);
+		Site site = client.getSite(new SiteId(31515461L));
 		System.out.println("site=" + site);
 	}
 
 	@Test
 	public void getSite_username() {
-		Site site = client.getSite("podcast55");
+		Site site = client.getSite(new SiteId("podcast55"));
 		System.out.println("site=" + site);
 	}
 }
