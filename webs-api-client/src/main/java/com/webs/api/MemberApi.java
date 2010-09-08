@@ -3,6 +3,7 @@ package com.webs.api;
 import java.util.List;
 
 import com.webs.api.model.WebsID;
+import com.webs.api.model.SiteSubscription;
 
 
 /**
@@ -12,6 +13,8 @@ import com.webs.api.model.WebsID;
  */
 public interface MemberApi {
 	public List<WebsID> getMembers(final Long siteId);
+
+	public List<WebsID> getMembers(final String username);
 
 	public WebsID joinSite(final WebsID member, final Long siteId);
 
@@ -32,4 +35,9 @@ public interface MemberApi {
 	// XXX get feeds
 
 	// XXX profile tabs
+	
+	// XXX should take a query parameter to filter by permission level
+	public List<SiteSubscription> getSiteSubscriptions(final String emailAddress);
+
+	public List<SiteSubscription> getSiteSubscriptions(final Long websId);
 }
