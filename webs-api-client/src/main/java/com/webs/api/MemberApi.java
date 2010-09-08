@@ -2,8 +2,10 @@ package com.webs.api;
 
 import java.util.List;
 
-import com.webs.api.model.WebsID;
 import com.webs.api.model.SiteSubscription;
+import com.webs.api.model.WebsID;
+import com.webs.api.model.id.SiteId;
+import com.webs.api.model.id.WebsIDId;
 
 
 /**
@@ -12,23 +14,21 @@ import com.webs.api.model.SiteSubscription;
  * @author Patrick Carroll
  */
 public interface MemberApi {
-	public List<WebsID> getMembers(final Long siteId);
+	public List<WebsID> getMembers(final SiteId siteId);
 
-	public List<WebsID> getMembers(final String username);
+	public WebsID joinSite(final WebsID member, final SiteId siteId);
 
-	public WebsID joinSite(final WebsID member, final Long siteId);
+	public WebsID getMember(final WebsIDId websIDId, final SiteId siteId);
 
-	public WebsID getMember(final Long memberId, final Long siteId);
+	public void updateMember(final WebsID member, final SiteId siteId);
 
-	public void updateMember(final WebsID member, final Long siteId);
+	public void updateMemberStatus(final WebsIDId websIDId, final SiteId siteId, final String status); 
 
-	public void updateMemberStatus(final Long memberId, final Long siteId, final String status); 
+	public void clearMemberStatus(final WebsIDId websIDId, final SiteId siteId); 
 
-	public void clearMemberStatus(final Long memberId, final Long siteId); 
+	public void leaveSite(final WebsIDId websIDId, final SiteId siteId);
 
-	public void leaveSite(final Long memberId, final Long siteId);
-
-	public List<WebsID> getFriends(final Long memberId, final Long siteId);
+	public List<WebsID> getFriends(final WebsIDId websIDId, final SiteId siteId);
 
 	// XXX request friendship
 
@@ -37,7 +37,5 @@ public interface MemberApi {
 	// XXX profile tabs
 	
 	// XXX should take a query parameter to filter by permission level
-	public List<SiteSubscription> getSiteSubscriptions(final String emailAddress);
-
-	public List<SiteSubscription> getSiteSubscriptions(final Long websId);
+	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId);
 }

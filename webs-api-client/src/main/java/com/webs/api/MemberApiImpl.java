@@ -14,6 +14,8 @@ import org.codehaus.jackson.type.TypeReference;
 import com.webs.api.http.AbstractHttpApiClientAware;
 import com.webs.api.model.SiteSubscription;
 import com.webs.api.model.WebsID;
+import com.webs.api.model.id.SiteId;
+import com.webs.api.model.id.WebsIDId;
 
 
 /**
@@ -24,15 +26,11 @@ public class MemberApiImpl extends AbstractHttpApiClientAware implements MemberA
 	}
 
 
-	public List<WebsID> getMembers(final Long siteId) {
-		return getMembers(siteId.toString());
-	}
-
-	public List<WebsID> getMembers(final String username) {
+	public List<WebsID> getMembers(final SiteId siteId) {
 		try {
 			String data = httpApiClient.httpRequest(
 					new GetMethod(httpApiClient.getApiPath() + "sites/" 
-						+ username + "/members/"));
+						+ siteId.toString() + "/members/"));
 			return jsonMapper.readValue(data, new TypeReference<List<WebsID>>() { });
 		} catch (IOException e) {
 			log.fatal("Error converting JSON to List<App>: " + e);
@@ -40,15 +38,17 @@ public class MemberApiImpl extends AbstractHttpApiClientAware implements MemberA
 		}
 	}
 
-	public WebsID joinSite(final WebsID member, final Long siteId) {
+	public WebsID joinSite(final WebsID member, final SiteId siteId) {
+		// XXX
 		return null;
 	}
 
-	public WebsID getMember(final Long memberId, final Long siteId) {
+	public WebsID getMember(final WebsIDId websIDId, final SiteId siteId) {
 		try {
 			String data = httpApiClient.httpRequest(
 					new GetMethod(httpApiClient.getApiPath() + "sites/" 
-						+ siteId + "/members/" + memberId + "/"));
+						+ siteId.toString() + "/members/" 
+						+ websIDId.toString() + "/"));
 			return jsonMapper.readValue(data, WebsID.class);
 		} catch (IOException e) {
 			log.fatal("Error converting JSON to WebsID: " + e);
@@ -56,10 +56,11 @@ public class MemberApiImpl extends AbstractHttpApiClientAware implements MemberA
 		}
 	}
 
-	public void updateMember(final WebsID member, final Long siteId) {
+	public void updateMember(final WebsID member, final SiteId siteId) {
 		try {
 			PutMethod put = new PutMethod(httpApiClient.getApiPath() 
-					+ "sites/" + siteId + "/members/" + member.getId() + "/");
+					+ "sites/" + siteId.toString() + "/members/" 
+					+ member.getId() + "/");
 			put.setRequestBody(jsonMapper.writeValueAsString(member));
 
 			httpApiClient.httpRequest(put, HttpStatus.SC_NO_CONTENT);
@@ -68,32 +69,27 @@ public class MemberApiImpl extends AbstractHttpApiClientAware implements MemberA
 		}
 	}
 
-	public void updateMemberStatus(final Long memberId, final Long siteId, final String status) {
-		WebsID member = getMember(memberId, siteId);
+	public void updateMemberStatus(final WebsIDId websIDId, final SiteId siteId, final String status) {
+		WebsID member = getMember(websIDId, siteId);
 		member.setStatus(status);
 		updateMember(member, siteId);
 	}
 
-	public void clearMemberStatus(final Long memberId, final Long siteId) {
-		updateMemberStatus(memberId, siteId, null);
+	public void clearMemberStatus(final WebsIDId websIDId, final SiteId siteId) {
+		updateMemberStatus(websIDId, siteId, null);
 	}
 
-	public void leaveSite(final Long memberId, final Long siteId) {
+	public void leaveSite(final WebsIDId websIDId, final SiteId siteId) {
 		// XXX
 		return;
 	}
 
-	public List<WebsID> getFriends(final Long memberId, final Long siteId) {
+	public List<WebsID> getFriends(final WebsIDId websIDId, final SiteId siteId) {
 		// XXX
 		return null;
 	}
 
-	public List<SiteSubscription> getSiteSubscriptions(final String emailAddress) {
-		// XXX
-		return null;
-	}
-
-	public List<SiteSubscription> getSiteSubscriptions(final Long websId) {
+	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId) {
 		// XXX
 		return null;
 	}

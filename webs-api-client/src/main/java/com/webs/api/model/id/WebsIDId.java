@@ -9,16 +9,16 @@ import java.io.Serializable;
  *
  * @author Patrick Carroll
  */
-public class MemberId implements Serializable {
+public class WebsIDId implements Serializable {
 	private Long id;
 
 	private String emailAddress;
 
-	public MemberId(Long id) {
+	public WebsIDId(Long id) {
 		setId(id);
 	}
 
-	public MemberId(String emailAddress) {
+	public WebsIDId(String emailAddress) {
 		setEmailAddress(emailAddress);
 	}
 

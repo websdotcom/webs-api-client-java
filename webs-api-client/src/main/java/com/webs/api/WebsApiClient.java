@@ -11,6 +11,7 @@ import com.webs.api.model.SiteSubscription;
 import com.webs.api.model.WebsID;
 import com.webs.api.model.id.AppId;
 import com.webs.api.model.id.SiteId;
+import com.webs.api.model.id.WebsIDId;
 
 
 /**
@@ -135,48 +136,40 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 
 
 	// member api methods
-	public List<WebsID> getMembers(final Long siteId) {
-		return getMembers(siteId.toString());
+	public List<WebsID> getMembers(final SiteId siteId) {
+		return getMembers(siteId);
 	}
 
-	public List<WebsID> getMembers(final String username) {
-		return memberApi.getMembers(username);
-	}
-
-	public WebsID joinSite(final WebsID member, final Long siteId) {
+	public WebsID joinSite(final WebsID member, final SiteId siteId) {
 		return memberApi.joinSite(member, siteId);
 	}
 
-	public WebsID getMember(final Long memberId, final Long siteId) {
-		return memberApi.getMember(memberId, siteId);
+	public WebsID getMember(final WebsIDId websIDId, final SiteId siteId) {
+		return memberApi.getMember(websIDId, siteId);
 	}
 
-	public void updateMember(final WebsID member, final Long siteId) {
+	public void updateMember(final WebsID member, final SiteId siteId) {
 		memberApi.updateMember(member, siteId);
 	}
 
-	public void updateMemberStatus(final Long memberId, final Long siteId, final String status) {
-		memberApi.updateMemberStatus(memberId, siteId, status);
+	public void updateMemberStatus(final WebsIDId websIDId, final SiteId siteId, final String status) {
+		memberApi.updateMemberStatus(websIDId, siteId, status);
 	}
 
-	public void clearMemberStatus(final Long memberId, final Long siteId) {
-		updateMemberStatus(memberId, siteId, null);
+	public void clearMemberStatus(final WebsIDId websIDId, final SiteId siteId) {
+		updateMemberStatus(websIDId, siteId, null);
 	}
 
-	public void leaveSite(final Long memberId, final Long siteId) {
-		memberApi.leaveSite(memberId, siteId);
+	public void leaveSite(final WebsIDId websIDId, final SiteId siteId) {
+		memberApi.leaveSite(websIDId, siteId);
 	}
 
-	public List<WebsID> getFriends(final Long memberId, final Long siteId) {
-		return memberApi.getFriends(memberId, siteId);
+	public List<WebsID> getFriends(final WebsIDId websIDId, final SiteId siteId) {
+		return memberApi.getFriends(websIDId, siteId);
 	}
 
-	public List<SiteSubscription> getSiteSubscriptions(final String emailAddress) {
-		return memberApi.getSiteSubscriptions(emailAddress);
-	}
-
-	public List<SiteSubscription> getSiteSubscriptions(final Long websId) {
-		return memberApi.getSiteSubscriptions(websId);
+	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId) {
+		return memberApi.getSiteSubscriptions(websIDId);
 	}
 
 
