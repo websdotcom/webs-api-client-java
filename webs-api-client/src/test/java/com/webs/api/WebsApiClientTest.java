@@ -1,12 +1,16 @@
 package com.webs.api;
 
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static junit.framework.Assert.assertTrue;
 
 import com.webs.api.model.Site;
+import com.webs.api.model.SiteSubscription;
 import com.webs.api.model.id.SiteId;
+import com.webs.api.model.id.WebsIDId;
 
 
 /**
@@ -32,5 +36,11 @@ public class WebsApiClientTest {
 	public void getSite_username() {
 		Site site = client.getSite(new SiteId("podcast55"));
 		System.out.println("site=" + site);
+	}
+
+	@Test
+	public void getSiteSubscriptions() {
+		List<SiteSubscription> subscriptions = client.getSiteSubscriptions(new WebsIDId("patrick@webs.com"));
+		System.out.println("subscriptions= " + subscriptions);
 	}
 }

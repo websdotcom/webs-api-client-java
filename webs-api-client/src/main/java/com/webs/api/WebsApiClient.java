@@ -171,10 +171,18 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 		return memberApi.getFriends(websIDId, siteId);
 	}
 
+	public SiteSubscription getSiteSubscription(final WebsIDId websIDId, final SiteId siteId) {
+		return memberApi.getSiteSubscription(websIDId, siteId);
+	}
+
 	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId) {
 		return memberApi.getSiteSubscriptions(websIDId);
 	}
 
+	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId, final String permission) {
+		return memberApi.getSiteSubscriptions(websIDId, permission);
+	}
+	
 
 	// site api methods
 	public Site getSite(final SiteId siteId) {

@@ -89,8 +89,39 @@ public class MemberApiImpl extends AbstractHttpApiClientAware implements MemberA
 		return null;
 	}
 
+	public SiteSubscription getSiteSubscription(final WebsIDId websIDId, final SiteId siteId) {
+		try {
+			String data = httpApiClient.httpRequest(
+					new GetMethod(httpApiClient.getApiPath() + "websid/"
+						+ websIDId.toString() + "/sites/" 
+						+ siteId.toString() + "/"));
+			return jsonMapper.readValue(data, SiteSubscription.class);
+		} catch (IOException e) {
+			log.fatal("Error converting JSON to WebsID: " + e);
+			return null;
+		}
+	}
+
 	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId) {
-		// XXX
-		return null;
+		return getSiteSubscriptions(websIDId, null);
+	}
+
+	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId, final String permission) {
+		try {
+			GetMethod get = new GetMethod(httpApiClient.getApiPath() 
+					+ "websid/" + websIDId.toString() + "/sites/");
+
+			if (permission != null)
+				get.setQueryString(new NameValuePair[] {
+					new NameValuePair("permission", permission),
+				});
+
+			String data = httpApiClient.httpRequest(get);
+
+			return jsonMapper.readValue(data, new TypeReference<List<SiteSubscription>>() { });
+		} catch (IOException e) {
+			log.fatal("Error converting JSON to WebsID: " + e);
+			return null;
+		}
 	}
 }

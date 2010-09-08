@@ -36,6 +36,9 @@ public interface MemberApi {
 
 	// XXX profile tabs
 	
-	// XXX should take a query parameter to filter by permission level
+	public SiteSubscription getSiteSubscription(final WebsIDId websIDId, final SiteId siteId);
+
 	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId);
+
+	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId, final String permission);
 }
