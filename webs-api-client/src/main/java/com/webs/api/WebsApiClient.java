@@ -98,33 +98,15 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 	}
 
 
-	/**
-	 * Get all publicly available apps
-	 *
-	 * @return	A list of all publicly available apps on Webs.com
-	 */
+	// AppApi implementations
 	public List<App> getAllApps() {
 		return appApi.getAllApps();
 	}
 
-	/**
-	 * Get the app corresponding to the given appId
-	 *
-	 * @param appId	The id of the corresponding app
-	 *
-	 * @return The app that was found or null if none are found
-	 */
 	public App getApp(final AppId appId) {
 		return appApi.getApp(appId);
 	}
 
-	/**
-	 * Get all publicly installed apps on the site corresponding to siteId
-	 *
-	 * @param siteId	The unique id corresponding to the site
-	 *
-	 * @return A list of all publicly available apps
-	 */
 	public List<App> getApps(final SiteId siteId) {
 		return appApi.getApps(siteId);
 	}
@@ -138,17 +120,17 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 	}
 
 
-	// member api methods
+	// MemberApi implementations
+	public WebsID getMember(final WebsIDId websIDId, final SiteId siteId) {
+		return memberApi.getMember(websIDId, siteId);
+	}
+
 	public List<WebsID> getMembers(final SiteId siteId) {
 		return getMembers(siteId);
 	}
 
 	public WebsID joinSite(final WebsID member, final SiteId siteId) {
 		return memberApi.joinSite(member, siteId);
-	}
-
-	public WebsID getMember(final WebsIDId websIDId, final SiteId siteId) {
-		return memberApi.getMember(websIDId, siteId);
 	}
 
 	public void updateMember(final WebsID member, final SiteId siteId) {
@@ -184,7 +166,7 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 	}
 	
 
-	// site api methods
+	// SiteApi implementations
 	public Site getSite(final SiteId siteId) {
 		return siteApi.getSite(siteId);
 	}

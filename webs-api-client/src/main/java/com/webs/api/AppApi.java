@@ -15,50 +15,46 @@ import com.webs.api.model.id.SiteId;
 public interface AppApi {
 	/**
 	 * Get all publicly available apps
+	 *
+	 * @return	A list of all publicly available apps on Webs.com
 	 */
 	public List<App> getAllApps();
 
 	/**
 	 * Get the app corresponding to the given appId
 	 *
-	 * @param app	The unique identifier for this app.  Either an id 
-	 * converted to a string, or an app handle (i.e., "photos", "calendar")
+	 * @param appId	The id of the corresponding app
 	 *
-	 * @return The app that was found.  If none are found, returns null
-	 *
+	 * @return The app that was found or null if none are found
 	 */
 	public App getApp(final AppId appId);
 
 	/**
-	 * Get all currently installed apps on the given site
+	 * Get all publicly installed apps on the site corresponding to siteId
 	 *
-	 * @param site	The unique identifier for this site.  Either an id 
-	 * converted to a string, or a valid username
+	 * @param siteId	The unique id corresponding to the site
 	 *
+	 * @return A list of all publicly available apps
 	 */
 	public List<App> getApps(final SiteId siteId); 
 
 	/**
-	 * Install the given app on the given site
+	 * Install the given app on a site.  This method requires a valid OAuth 
+	 * token with site owner permissions
 	 *
-	 * @param app	The unique identifier for this app.  Either an id 
-	 * converted to a string, or an app handle (i.e., "photos", "calendar")
-	 *
-	 * @param site	The unique identifier for this site.  Either an id 
-	 * converted to a string, or a valid username
-	 *
+	 * @param appId		The unique id corresponding to the app to be 
+	 * 					installed
+	 * @param siteId	The unique id corresponding to the site
 	 */
 	public void installApp(final AppId appId, final SiteId siteId);
 
 	/**
-	 * Install the given app on the given site
+	 * Uninstall the given app from a site.  This method requires a valid 
+	 * OAuth token with site owner permissions
 	 *
-	 * @param app	The unique identifier for this app.  Either an id 
-	 * converted to a string, or an app handle (i.e., "photos", "calendar")
-	 *
-	 * @param site	The unique identifier for this site.  Either an id 
-	 * converted to a string, or a valid username
-	 *
+	 * @param appId		The unique id corresponding to the app to be 
+	 * 					uninstalled
+	 * @param siteId	The unique id corresponding to the site
 	 */
 	public void uninstallApp(final AppId appId, final SiteId siteId);
 }
