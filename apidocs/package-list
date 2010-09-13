@@ -1,0 +1,5 @@
+com.webs.api
+com.webs.api.exception
+com.webs.api.http
+com.webs.api.model
+com.webs.api.model.id
