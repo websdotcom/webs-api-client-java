@@ -2,6 +2,9 @@ package com.webs.api.model;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 
@@ -59,6 +62,16 @@ public class Sidebar implements Serializable {
 
 	@Override
 	public String toString() {
-		return getTitle();
+		return ToStringBuilder.reflectionToString(this);
+	}
+
+	@Override
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return EqualsBuilder.reflectionEquals(this, o);
 	}
 }
