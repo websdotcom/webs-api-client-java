@@ -22,7 +22,6 @@ import com.webs.api.model.id.SiteId;
  * @author Patrick Carroll
  */
 public class AppApiTest {
-	// XXX need a release_date
 	private static final String TEST_JSON_APP = "{\"id\": 1, \"handle\": \"photos\", \"name\": \"Photos App\", \"description\": \"Photos app\", \"category\": \"pictures\", \"developer_name\": \"Patrick Carroll\", \"developer_url\": \"http://webs.com\"}";
 
 	private AppApiImpl client;
@@ -60,7 +59,14 @@ public class AppApiTest {
 
 		App app = client.getApp(new AppId("photos"));
 		assertNotNull(app);
+		assertEquals(new Long(1), app.getId());
 		assertEquals("photos", app.getHandle());
+		assertEquals("Photos App", app.getName());
+		assertEquals("Photos app", app.getDescription());
+		assertEquals("pictures", app.getCategory());
+		assertEquals("Patrick Carroll", app.getDeveloperName());
+		assertEquals("http://webs.com", app.getDeveloperUrl());
+		// XXX test release_date
 
 		verify(mockHttpApiClient);
 	}
