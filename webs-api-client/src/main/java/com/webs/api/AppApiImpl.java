@@ -78,9 +78,7 @@ public class AppApiImpl extends AbstractHttpApiClientAware implements AppApi {
 			key = "handle";
 		}
 
-		NameValuePair[] data = {
-			new NameValuePair(key, app),
-		};
+		NameValuePair[] data = { new NameValuePair(key, app), };
 
 		post.setRequestBody(data);
 

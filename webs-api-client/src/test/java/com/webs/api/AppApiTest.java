@@ -3,10 +3,16 @@ package com.webs.api;
 import java.util.List;
 
 import static junit.framework.Assert.*;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import static org.easymock.EasyMock.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.webs.api.http.HttpApiClient;
 import com.webs.api.model.App;
 import com.webs.api.model.id.AppId;
 import com.webs.api.model.id.SiteId;
@@ -16,45 +22,82 @@ import com.webs.api.model.id.SiteId;
  * @author Patrick Carroll
  */
 public class AppApiTest {
-	private Long TEST_APP_ID = 2L; // XXX
+	// XXX need a release_date
+	private static final String TEST_JSON_APP = "{\"id\": 1, \"handle\": \"photos\", \"name\": \"Photos App\", \"description\": \"Photos app\", \"category\": \"pictures\", \"developer_name\": \"Patrick Carroll\", \"developer_url\": \"http://webs.com\"}";
 
-	private Long TEST_SITE_ID = 1L; // XXX
+	private AppApiImpl client;
 
-	private AppApi client;
+	private HttpApiClient mockHttpApiClient;
 
 
 	@Before
 	public void setUp() {
-		client = new WebsApiClient();
+		client = new AppApiImpl();
+		mockHttpApiClient = createMock(HttpApiClient.class);
+
+		client.setHttpApiClient(mockHttpApiClient);
 	}
 
 
 	@Test
 	public void getAllApps() {
+		expect(mockHttpApiClient.getApiPath()).andReturn("https://api.webs.com/");
+		expect(mockHttpApiClient.httpRequest((GetMethod)notNull())).andReturn("[" + TEST_JSON_APP + "]");
+		replay(mockHttpApiClient);
+
 		List<App> apps = client.getAllApps();
 		assertNotNull(apps);
 		assertFalse(apps.isEmpty());
+
+		verify(mockHttpApiClient);
 	}
 
 	@Test
 	public void getApp() {
-		App app = client.getApp(new AppId(TEST_APP_ID));
+		expect(mockHttpApiClient.getApiPath()).andReturn("https://api.webs.com/");
+		expect(mockHttpApiClient.httpRequest((GetMethod)notNull())).andReturn(TEST_JSON_APP);
+		replay(mockHttpApiClient);
+
+		App app = client.getApp(new AppId("photos"));
 		assertNotNull(app);
 		assertEquals("photos", app.getHandle());
+
+		verify(mockHttpApiClient);
 	}
 
 	@Test
 	public void getApps() {
-		List<App> apps = client.getApps(new SiteId(TEST_SITE_ID));
+		expect(mockHttpApiClient.getApiPath()).andReturn("https://api.webs.com/");
+		expect(mockHttpApiClient.httpRequest((GetMethod)notNull())).andReturn("[" + TEST_JSON_APP + "]");
+		replay(mockHttpApiClient);
+
+		List<App> apps = client.getApps(new SiteId("patrick"));
+		assertNotNull(apps);
+		assertFalse(apps.isEmpty());
+
+		verify(mockHttpApiClient);
 	}
 
 	@Test
 	public void installApp() {
+		expect(mockHttpApiClient.getApiPath()).andReturn("https://api.webs.com/");
+		// XXX would be nice to be able to inspect the PostMethod object
+		expect(mockHttpApiClient.httpRequest((PostMethod)notNull(), eq(HttpStatus.SC_CREATED))).andReturn(null);
+		replay(mockHttpApiClient);
 
+		client.installApp(new AppId("photos"), new SiteId("patrick"));
+
+		verify(mockHttpApiClient);
 	}
 
 	@Test
 	public void uninstallApp() {
+		expect(mockHttpApiClient.getApiPath()).andReturn("https://api.webs.com/");
+		expect(mockHttpApiClient.httpRequest((DeleteMethod)notNull())).andReturn(null);
+		replay(mockHttpApiClient);
 
+		client.uninstallApp(new AppId("photos"), new SiteId("patrick"));
+
+		verify(mockHttpApiClient);
 	}
 }
