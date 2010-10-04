@@ -112,9 +112,7 @@ public class MemberApiImpl extends AbstractHttpApiClientAware implements MemberA
 					+ "websid/" + websIDId.toString() + "/sites/");
 
 			if (permission != null)
-				get.setQueryString(new NameValuePair[] {
-					new NameValuePair("permission", permission),
-				});
+				get.setQueryString(new NameValuePair[] { new NameValuePair("permission", permission), });
 
 			String data = httpApiClient.httpRequest(get);
 
