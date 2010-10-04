@@ -3,6 +3,7 @@ package com.webs.api;
 import java.util.List;
 
 import com.webs.api.http.HttpApiClient;
+import com.webs.api.http.HttpApiClientApacheCommonsImpl;
 import com.webs.api.http.HttpApiClientAware;
 import com.webs.api.model.App;
 import com.webs.api.model.Sidebar;
@@ -37,7 +38,7 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 	 * Create an API client without an OAuth access token
 	 */
 	public WebsApiClient() {
-		this.httpApiClient = new HttpApiClient();
+		this.httpApiClient = new HttpApiClientApacheCommonsImpl();
 
 		this.appApi = new AppApiImpl();
 		((HttpApiClientAware)appApi).setHttpApiClient(httpApiClient);
