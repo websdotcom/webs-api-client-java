@@ -11,6 +11,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.codehaus.jackson.type.TypeReference;
 
+import com.webs.api.exception.UsageErrorApiException;
 import com.webs.api.http.AbstractHttpApiClientAware;
 import com.webs.api.model.Site;
 import com.webs.api.model.id.SiteId;
@@ -38,14 +39,12 @@ public class SiteApiImpl extends AbstractHttpApiClientAware implements SiteApi {
 
 	public void updateSite(final Site site) {
 		String identifier;
-		if (site.getId() != null) {
+		if (site.getId() != null) 
 			identifier = site.getId().toString();
-		} else if (site.getUsername() != null) {
+		else if (site.getUsername() != null) 
 			identifier = site.getUsername().toString();
-		} else {
-			log.fatal("updateSite requires either site.id or site.username to be set");
-			return;
-		}
+		else 
+			throw new UsageErrorApiException("updateSite requires either site.id or site.username to be set");
 
 		try {
 			PutMethod put = new PutMethod(httpApiClient.getApiPath() 
