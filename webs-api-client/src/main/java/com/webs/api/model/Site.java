@@ -44,6 +44,8 @@ public class Site implements Serializable {
 
 	private List<String> keywords;
 
+	private boolean advanced;
+
 
 	public Site() {
 	}
@@ -135,6 +137,14 @@ public class Site implements Serializable {
 
 	public void setKeywords(List<String> keywords) {
 		this.keywords = keywords;
+	}
+
+	public boolean isAdvanced() {
+		return advanced;
+	}
+
+	public void setAdvanced(boolean advanced) {
+		this.advanced = advanced;
 	}
 
 

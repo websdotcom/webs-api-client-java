@@ -21,21 +21,27 @@ public class SiteSubscription implements Serializable {
 
 	private Long id;
 
+	@JsonProperty("site_id")
 	private Long siteId;
 
 	private String username;
 
+	@JsonProperty("site_title")
 	private String siteTitle;
 
 	private String url;
 
 	private String permission;
 
+	@JsonProperty("creation_date")
 	private Date creationDate;
 
+	@JsonProperty("last_login")
 	private Date lastLogin;
 
+	@JsonProperty("subscription_private")
 	private boolean subscriptionPrivate;
+
 
 
 	public SiteSubscription() {

@@ -22,7 +22,7 @@ public class App implements Serializable {
 
 	private String name;
 
-	// XXX it can't seem to bind date objects right
+	@JsonProperty("release_date")
 	private Date releaseDate;
 
 	private String description;
