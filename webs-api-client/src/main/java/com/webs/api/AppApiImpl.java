@@ -1,6 +1,5 @@
 package com.webs.api;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.httpclient.HttpStatus;
@@ -9,7 +8,6 @@ import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.codehaus.jackson.type.TypeReference;
 
 import com.webs.api.http.AbstractHttpApiClientAware;
 import com.webs.api.model.App;
@@ -21,48 +19,37 @@ import com.webs.api.model.id.SiteId;
  * @author Patrick Carroll
  */
 public class AppApiImpl extends AbstractHttpApiClientAware implements AppApi {
+	private WebsApiModelMapper<App> appMapper = new WebsApiModelMapper<App>(App.class);
+
+
 	public AppApiImpl() {
 	}
 
 
+	// XXX paginate
 	public List<App> getAllApps() {
-		try {
-			String data = httpApiClient.httpRequest(
-					new GetMethod(httpApiClient.getApiPath() + "apps/"));
-			return jsonMapper.readValue(data, new TypeReference<List<App>>() { });
-		} catch (IOException e) {
-			log.fatal("Error converting JSON to List<App>: " + e);
-			return null;
-		}
+		return httpApiClient.httpRequestMapperToList(
+					new GetMethod(httpApiClient.getApiPath() + "apps/"),
+					HttpStatus.SC_OK, appMapper);
 	}
+
 
 	public App getApp(final AppId appId) {
-		String app = appId.toString();
-
-		try {
-			String data = httpApiClient.httpRequest(
-					new GetMethod(httpApiClient.getApiPath() + "apps/" 
-						+ app + "/"));
-			return jsonMapper.readValue(data, App.class);
-		} catch (IOException e) {
-			log.fatal("Error converting JSON to App: " + e);
-			return null;
-		}
+		return httpApiClient.httpRequestMapper(
+				new GetMethod(httpApiClient.getApiPath() + "apps/" 
+					+ appId.toString() + "/"), 
+				HttpStatus.SC_OK, appMapper);
 	}
 
+
+	// XXX paginate
 	public List<App> getApps(final SiteId siteId) {
-		String site = siteId.toString();
-
-		try {
-			String data = httpApiClient.httpRequest(
+		return httpApiClient.httpRequestMapperToList(
 					new GetMethod(httpApiClient.getApiPath() + "sites/" 
-						+ site + "/apps/"));
-			return jsonMapper.readValue(data, new TypeReference<List<App>>() { });
-		} catch (IOException e) {
-			log.fatal("Error converting JSON to List<App>: " + e);
-			return null;
-		}
+						+ siteId.toString() + "/apps/"), 
+					HttpStatus.SC_OK, appMapper);
 	}
+
 
 	public void installApp(final AppId appId, final SiteId siteId) {
 		String app = appId.toString();

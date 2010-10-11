@@ -1,5 +1,6 @@
 package com.webs.api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.*;
@@ -12,6 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.webs.api.WebsApiModelMapper;
 import com.webs.api.http.HttpApiClient;
 import com.webs.api.model.App;
 import com.webs.api.model.id.AppId;
@@ -24,7 +26,7 @@ import com.webs.api.model.id.SiteId;
 public class AppApiTest {
 	private static final String TEST_JSON_APP = "{\"id\": 1, \"handle\": \"photos\", \"name\": \"Photos App\", \"description\": \"Photos app\", \"category\": \"pictures\", \"developer_name\": \"Patrick Carroll\", \"developer_url\": \"http://webs.com\"}";
 
-	private AppApiImpl client;
+	private AppApi client;
 
 	private HttpApiClient mockHttpApiClient;
 
@@ -34,19 +36,19 @@ public class AppApiTest {
 		client = new AppApiImpl();
 		mockHttpApiClient = createMock(HttpApiClient.class);
 
-		client.setHttpApiClient(mockHttpApiClient);
+		((AppApiImpl)client).setHttpApiClient(mockHttpApiClient);
 	}
 
 
 	@Test
 	public void getAllApps() {
 		expect(mockHttpApiClient.getApiPath()).andReturn("https://api.webs.com/");
-		expect(mockHttpApiClient.httpRequest((GetMethod)notNull())).andReturn("[" + TEST_JSON_APP + "]");
+		expect(mockHttpApiClient.httpRequestMapperToList((GetMethod)notNull(), (Integer)notNull(), (WebsApiModelMapper)notNull())).andReturn(new ArrayList<App>());
 		replay(mockHttpApiClient);
 
 		List<App> apps = client.getAllApps();
 		assertNotNull(apps);
-		assertFalse(apps.isEmpty());
+		assertTrue(apps.isEmpty());
 
 		verify(mockHttpApiClient);
 	}

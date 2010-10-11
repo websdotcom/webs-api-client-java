@@ -20,10 +20,6 @@ public class WebsApiModelMapper<T> {
 	protected Class<T> type;
 
 
-	public WebsApiModelMapper() {
-		// XXX
-	}
-
 	public WebsApiModelMapper(Class<T> type) {
 		this.type = type;
 	}
@@ -33,7 +29,7 @@ public class WebsApiModelMapper<T> {
 		return jsonMapper.readValue(data, type);
 	}
 
-	public List<T> mapModelToList(String data, int page, int pageSize, long totalSize) throws IOException {
+	public List<T> mapModelToList(String data) throws IOException {
 		return jsonMapper.readValue(data, new TypeReference<List<T>>() { });
 	}
 

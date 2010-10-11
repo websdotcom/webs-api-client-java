@@ -2,6 +2,7 @@ package com.webs.api.http;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
@@ -18,6 +19,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import com.webs.api.WebsApiModelMapper;
 import com.webs.api.exception.HttpApiException;
 import com.webs.api.exception.UsageErrorApiException;
+import com.webs.api.pagination.Page;
 
 
 /**
@@ -29,8 +31,6 @@ public class HttpApiClientApacheCommonsImpl implements HttpApiClient {
 	private static final int CONNECTION_TIMEOUT = 5000;
 
 	private static final int SOCKET_TIMEOUT = 10000;
-
-	private ObjectMapper jsonMapper = new ObjectMapper();
 
 	private String apiPath = "https://api.webs.com/";
 
@@ -117,59 +117,42 @@ public class HttpApiClientApacheCommonsImpl implements HttpApiClient {
 		throw new HttpApiException("No content received from server");
 	}
 
+
 	@Override
 	public <T> T httpRequestMapper(HttpMethod method, int expectedStatus, WebsApiModelMapper<T> mapper) {
-		HttpConnectionManager connectionManager = new SimpleHttpConnectionManager(true);
-		HttpConnectionManagerParams params = new HttpConnectionManagerParams();
-		params.setConnectionTimeout(CONNECTION_TIMEOUT);
-		params.setSoTimeout(SOCKET_TIMEOUT);
-		connectionManager.setParams(params);
-
-		HttpClient client = new HttpClient(connectionManager);
-		method.addRequestHeader("Accept", "application/json");
-		method.addRequestHeader("Content-Type", "application/json");
-
-		if (accessToken != null) 
-			method.addRequestHeader("Authorization", 
-					"Token token=\"" + accessToken + "\"");
-
 		try {
-			int statusCode = client.executeMethod(method);
-
-			if (statusCode != expectedStatus)
-				throw new HttpApiException("" + statusCode);
-
-			if (statusCode == HttpStatus.SC_NO_CONTENT)
-				return null;
-
-			InputStream stream = method.getResponseBodyAsStream();
-
-			String data = extractContent(stream);
-			if (mapper != null) {
-				// XXX call the Page one if it's a paged result
-				try {
-					return mapper.mapModel(data);
-				} catch (IOException e) {
-					log.fatal("Unable to map object: " + e);
-					return null;
-				}
-			} else {
-				return null;
-			}
-		} catch (HttpException e) {
-			log.fatal("HTTP error: " + e.getMessage());
+			return mapper.mapModel(httpRequest(method, expectedStatus));
 		} catch (IOException e) {
-			log.fatal("Connection error: " + e.getMessage());
-		} finally {
-			method.releaseConnection();
+			log.fatal("Unable to map object: " + e);
+			throw new HttpApiException("Unable to map object");
 		}
-
-		// shouldn't get here
-		throw new HttpApiException("No content received from server");
 	}
+
+	@Override
+	public <T> List<T> httpRequestMapperToList(HttpMethod method, int expectedStatus, WebsApiModelMapper<T> mapper) {
+		try {
+			return mapper.mapModelToList(httpRequest(method, expectedStatus));
+		} catch (IOException e) {
+			log.fatal("Unable to map object to list: " + e);
+			throw new HttpApiException("Unable to map object");
+		}
+	}
+
+	@Override
+	public <T> Page<T> httpRequestMapperToPage(HttpMethod method, int expectedStatus, WebsApiModelMapper<T> mapper) {
+		int page = 1, pageSize = 100, total = 50; // XXX
+		try {
+			return mapper.mapModelToPage(httpRequest(method, expectedStatus), page, pageSize, total);
+		} catch (IOException e) {
+			log.fatal("Unable to map object to page: " + e);
+			throw new HttpApiException("Unable to map object");
+		}
+	}
+
 	
 	@Override
 	public String extractContent(InputStream json) throws IOException {
+		ObjectMapper jsonMapper = new ObjectMapper();
 		JsonNode rootNode = jsonMapper.readValue(json, JsonNode.class);
 		if (rootNode.get("success") != null && !rootNode.path("success").getBooleanValue()) 
 			throw new UsageErrorApiException(rootNode.path("message").getValueAsText());

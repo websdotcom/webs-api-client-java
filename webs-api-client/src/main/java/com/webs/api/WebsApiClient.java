@@ -9,10 +9,13 @@ import com.webs.api.model.App;
 import com.webs.api.model.Sidebar;
 import com.webs.api.model.Site;
 import com.webs.api.model.SiteSubscription;
+import com.webs.api.model.Template;
+import com.webs.api.model.TemplateStyle;
 import com.webs.api.model.WebsID;
 import com.webs.api.model.id.AppId;
 import com.webs.api.model.id.SiteId;
 import com.webs.api.model.id.WebsIDId;
+import com.webs.api.pagination.Page;
 
 
 /**
@@ -24,12 +27,14 @@ import com.webs.api.model.id.WebsIDId;
  *  
  * @author Patrick Carroll
  */
-public class WebsApiClient implements AppApi, MemberApi, SiteApi {
+public class WebsApiClient implements AppApi, MemberApi, SiteApi, TemplateApi {
 	private AppApi appApi;
 
 	private MemberApi memberApi;
 
 	private SiteApi siteApi;
+
+	private TemplateApi templateApi;
 	
 	private HttpApiClient httpApiClient;
 
@@ -48,6 +53,9 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 
 		this.siteApi = new SiteApiImpl();
 		((HttpApiClientAware)siteApi).setHttpApiClient(httpApiClient);
+
+		this.templateApi = new TemplateApiImpl();
+		((HttpApiClientAware)templateApi).setHttpApiClient(httpApiClient);
 	}
 
 	/**
@@ -174,5 +182,31 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi {
 
 	public void updateSite(final Site site) {
 		siteApi.updateSite(site);
+	}
+
+
+	// TemplateApi implementation
+	public Template getTemplate(final Long templateId) {
+		return templateApi.getTemplate(templateId);
+	}
+
+	public TemplateStyle getTemplateStyle(final Long templateId, final Long templateStyleId) {
+		return templateApi.getTemplateStyle(templateId, templateStyleId);
+	}
+
+	public List<Template> getTemplates() {
+		return templateApi.getTemplates();
+	}
+
+	public Page<Template> getTemplates(int page, int pageSize) {
+		return templateApi.getTemplates(page, pageSize);
+	}
+
+	public List<TemplateStyle> getTemplateStyles(final Long templateId) {
+		return templateApi.getTemplateStyles(templateId);
+	}
+
+	public Page<TemplateStyle> getTemplateStyles(final Long templateId, int page, int pageSize) {
+		return templateApi.getTemplateStyles(templateId, page, pageSize);
 	}
 }

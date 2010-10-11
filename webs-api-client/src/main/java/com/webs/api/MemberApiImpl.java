@@ -9,9 +9,9 @@ import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.codehaus.jackson.type.TypeReference;
 
 import com.webs.api.http.AbstractHttpApiClientAware;
+import com.webs.api.exception.UsageErrorApiException;
 import com.webs.api.model.SiteSubscription;
 import com.webs.api.model.WebsID;
 import com.webs.api.model.id.SiteId;
@@ -22,20 +22,21 @@ import com.webs.api.model.id.WebsIDId;
  * @author Patrick Carroll
  */
 public class MemberApiImpl extends AbstractHttpApiClientAware implements MemberApi {
+	private WebsApiModelMapper<WebsID> websIDMapper = new WebsApiModelMapper<WebsID>(WebsID.class);
+
+	private WebsApiModelMapper<SiteSubscription> siteSubscriptionMapper = new WebsApiModelMapper<SiteSubscription>(SiteSubscription.class);
+
+
 	public MemberApiImpl() {
 	}
 
 
+	// XXX paginate
 	public List<WebsID> getMembers(final SiteId siteId) {
-		try {
-			String data = httpApiClient.httpRequest(
-					new GetMethod(httpApiClient.getApiPath() + "sites/" 
-						+ siteId.toString() + "/members/"));
-			return jsonMapper.readValue(data, new TypeReference<List<WebsID>>() { });
-		} catch (IOException e) {
-			log.fatal("Error converting JSON to List<App>: " + e);
-			return null;
-		}
+		return httpApiClient.httpRequestMapperToList(
+				new GetMethod(httpApiClient.getApiPath() + "sites/" 
+					+ siteId.toString() + "/members/"),
+				HttpStatus.SC_OK, websIDMapper);
 	}
 
 	public WebsID joinSite(final WebsID member, final SiteId siteId) {
@@ -44,29 +45,25 @@ public class MemberApiImpl extends AbstractHttpApiClientAware implements MemberA
 	}
 
 	public WebsID getMember(final WebsIDId websIDId, final SiteId siteId) {
-		try {
-			String data = httpApiClient.httpRequest(
-					new GetMethod(httpApiClient.getApiPath() + "sites/" 
-						+ siteId.toString() + "/members/" 
-						+ websIDId.toString() + "/"));
-			return jsonMapper.readValue(data, WebsID.class);
-		} catch (IOException e) {
-			log.fatal("Error converting JSON to WebsID: " + e);
-			return null;
-		}
+		return httpApiClient.httpRequestMapper(
+				new GetMethod(httpApiClient.getApiPath() + "sites/" 
+					+ siteId.toString() + "/members/" + websIDId.toString() 
+					+ "/"), HttpStatus.SC_OK, websIDMapper);
 	}
 
 	public void updateMember(final WebsID member, final SiteId siteId) {
+		PutMethod put = new PutMethod(httpApiClient.getApiPath() 
+				+ "sites/" + siteId.toString() + "/members/" 
+				+ member.getId() + "/");
+
 		try {
-			PutMethod put = new PutMethod(httpApiClient.getApiPath() 
-					+ "sites/" + siteId.toString() + "/members/" 
-					+ member.getId() + "/");
 			put.setRequestBody(jsonMapper.writeValueAsString(member));
 
-			httpApiClient.httpRequest(put, HttpStatus.SC_NO_CONTENT);
 		} catch (IOException e) {
-			log.fatal("Error converting JSON to WebsID: " + e);
+			throw new UsageErrorApiException("Error converting object to JSON");
 		}
+
+		httpApiClient.httpRequest(put, HttpStatus.SC_NO_CONTENT);
 	}
 
 	public void updateMemberStatus(final WebsIDId websIDId, final SiteId siteId, final String status) {
@@ -90,36 +87,26 @@ public class MemberApiImpl extends AbstractHttpApiClientAware implements MemberA
 	}
 
 	public SiteSubscription getSiteSubscription(final WebsIDId websIDId, final SiteId siteId) {
-		try {
-			String data = httpApiClient.httpRequest(
+		return httpApiClient.httpRequestMapper(
 					new GetMethod(httpApiClient.getApiPath() + "websid/"
 						+ websIDId.toString() + "/sites/" 
-						+ siteId.toString() + "/"));
-			return jsonMapper.readValue(data, SiteSubscription.class);
-		} catch (IOException e) {
-			log.fatal("Error converting JSON to WebsID: " + e);
-			return null;
-		}
+						+ siteId.toString() + "/"),
+					HttpStatus.SC_OK, siteSubscriptionMapper);
 	}
 
 	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId) {
 		return getSiteSubscriptions(websIDId, null);
 	}
 
+	// XXX paginate
 	public List<SiteSubscription> getSiteSubscriptions(final WebsIDId websIDId, final String permission) {
-		try {
-			GetMethod get = new GetMethod(httpApiClient.getApiPath() 
-					+ "websid/" + websIDId.toString() + "/sites/");
+		GetMethod get = new GetMethod(httpApiClient.getApiPath() 
+				+ "websid/" + websIDId.toString() + "/sites/");
 
-			if (permission != null)
-				get.setQueryString(new NameValuePair[] { new NameValuePair("permission", permission), });
+		if (permission != null)
+			get.setQueryString(new NameValuePair[] { new NameValuePair("permission", permission), });
 
-			String data = httpApiClient.httpRequest(get);
-
-			return jsonMapper.readValue(data, new TypeReference<List<SiteSubscription>>() { });
-		} catch (IOException e) {
-			log.fatal("Error converting JSON to WebsID: " + e);
-			return null;
-		}
+		return httpApiClient.httpRequestMapperToList(get, HttpStatus.SC_OK, 
+				siteSubscriptionMapper);
 	}
 }
