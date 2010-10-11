@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.webs.api.WebsApiModelMapper;
 import com.webs.api.exception.HttpApiException;
 import com.webs.api.exception.UsageErrorApiException;
 
@@ -116,6 +117,57 @@ public class HttpApiClientApacheCommonsImpl implements HttpApiClient {
 		throw new HttpApiException("No content received from server");
 	}
 
+	@Override
+	public <T> T httpRequestMapper(HttpMethod method, int expectedStatus, WebsApiModelMapper<T> mapper) {
+		HttpConnectionManager connectionManager = new SimpleHttpConnectionManager(true);
+		HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+		params.setConnectionTimeout(CONNECTION_TIMEOUT);
+		params.setSoTimeout(SOCKET_TIMEOUT);
+		connectionManager.setParams(params);
+
+		HttpClient client = new HttpClient(connectionManager);
+		method.addRequestHeader("Accept", "application/json");
+		method.addRequestHeader("Content-Type", "application/json");
+
+		if (accessToken != null) 
+			method.addRequestHeader("Authorization", 
+					"Token token=\"" + accessToken + "\"");
+
+		try {
+			int statusCode = client.executeMethod(method);
+
+			if (statusCode != expectedStatus)
+				throw new HttpApiException("" + statusCode);
+
+			if (statusCode == HttpStatus.SC_NO_CONTENT)
+				return null;
+
+			InputStream stream = method.getResponseBodyAsStream();
+
+			String data = extractContent(stream);
+			if (mapper != null) {
+				// XXX call the Page one if it's a paged result
+				try {
+					return mapper.mapModel(data);
+				} catch (IOException e) {
+					log.fatal("Unable to map object: " + e);
+					return null;
+				}
+			} else {
+				return null;
+			}
+		} catch (HttpException e) {
+			log.fatal("HTTP error: " + e.getMessage());
+		} catch (IOException e) {
+			log.fatal("Connection error: " + e.getMessage());
+		} finally {
+			method.releaseConnection();
+		}
+
+		// shouldn't get here
+		throw new HttpApiException("No content received from server");
+	}
+	
 	@Override
 	public String extractContent(InputStream json) throws IOException {
 		JsonNode rootNode = jsonMapper.readValue(json, JsonNode.class);

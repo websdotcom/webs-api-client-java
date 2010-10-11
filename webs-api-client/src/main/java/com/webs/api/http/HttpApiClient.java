@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpMethod;
 
+import com.webs.api.WebsApiModelMapper;
+
 
 /**
  * @author Patrick Carroll
@@ -21,6 +23,8 @@ public interface HttpApiClient {
 	public String httpRequest(HttpMethod method); 
 
 	public String httpRequest(HttpMethod method, int expectedStatus); 
+
+	public <T> T httpRequestMapper(HttpMethod method, int expectedStatus, WebsApiModelMapper<T> mapper); 
 
 	public String extractContent(InputStream json) throws IOException; 
 }
