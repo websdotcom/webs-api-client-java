@@ -46,6 +46,8 @@ public class Site implements Serializable {
 
 	private boolean advanced;
 
+	private boolean social;
+
 
 	public Site() {
 	}
@@ -145,6 +147,14 @@ public class Site implements Serializable {
 
 	public void setAdvanced(boolean advanced) {
 		this.advanced = advanced;
+	}
+
+	public boolean isSocial() {
+	    return social;
+	}
+	
+	public void setSocial(boolean social) {
+	    this.social = social;
 	}
 
 
