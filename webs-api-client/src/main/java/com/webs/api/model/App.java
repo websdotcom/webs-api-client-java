@@ -35,6 +35,11 @@ public class App implements Serializable {
 	@JsonProperty("developer_url")
 	private String developerUrl;
 
+	@JsonProperty("install_date")
+	private Date installDate;
+
+	private Integer tier;
+
 
 	public App() {
 	}
@@ -102,6 +107,22 @@ public class App implements Serializable {
 
 	public void setDeveloperUrl(String developerUrl) {
 		this.developerUrl = developerUrl;
+	}
+
+	public Date getInstallDate() {
+		return installDate;
+	}
+
+	public void setInstallDate(Date installDate) {
+		this.installDate = installDate;
+	}
+
+	public Integer getTier() {
+		return tier;
+	}
+
+	public void setTier(Integer tier) {
+		this.tier = tier;
 	}
 
 
