@@ -48,6 +48,9 @@ public class Site implements Serializable {
 
 	private boolean social;
 
+	@JsonProperty("custom_css_url")
+	private String customCssUrl;
+
 
 	public Site() {
 	}
@@ -155,6 +158,14 @@ public class Site implements Serializable {
 	
 	public void setSocial(boolean social) {
 	    this.social = social;
+	}
+
+	public String getCustomCssUrl() {
+		return customCssUrl;
+	}
+
+	public void setCustomCssUrl(String customCssUrl) {
+		this.customCssUrl = customCssUrl;
 	}
 
 
