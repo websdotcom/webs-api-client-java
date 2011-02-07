@@ -27,6 +27,9 @@ public class App implements Serializable {
 
 	private String description;
 
+	@JsonProperty("release_date")
+	private String fullDescription;
+
 	private String category;
 
 	@JsonProperty("developer_name")
@@ -39,6 +42,14 @@ public class App implements Serializable {
 	private Date installDate;
 
 	private Integer tier;
+
+	private Double rating;
+
+	@JsonProperty("terms_of_service_url")
+	private String termsOfServiceUrl;
+
+	@JsonProperty("privacy_policy_url")
+	private String privacyPolicyUrl;
 
 
 	public App() {
@@ -85,6 +96,14 @@ public class App implements Serializable {
 		this.description = description;
 	}
 
+	public String getFullDescription() {
+		return fullDescription;
+	}
+
+	public void setFullDescription(String fullDescription) {
+		this.fullDescription = fullDescription;
+	}
+
 	public String getCategory() {
 		return category;
 	}
@@ -123,6 +142,30 @@ public class App implements Serializable {
 
 	public void setTier(Integer tier) {
 		this.tier = tier;
+	}
+
+	public Double getRating() {
+		return rating;
+	}
+
+	public void setRating(Double rating) {
+		this.rating = rating;
+	}
+
+	public String getTermsOfServiceUrl() {
+		return termsOfServiceUrl;
+	}
+
+	public void setTermsOfServiceUrl(String termsOfServiceUrl) {
+		this.termsOfServiceUrl = termsOfServiceUrl;
+	}
+
+	public String getPrivacyPolicyUrl() {
+		return privacyPolicyUrl;
+	}
+
+	public void setPrivacyPolicyUrl(String privacyPolicyUrl) {
+		this.privacyPolicyUrl = privacyPolicyUrl;
 	}
 
 
