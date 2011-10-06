@@ -184,6 +184,10 @@ public class WebsApiClient implements AppApi, MemberApi, SiteApi, TemplateApi {
 		siteApi.updateSite(site);
 	}
 
+	public void deleteSite(final SiteId siteId) {
+		siteApi.deleteSite(siteId);
+	}
+
 
 	// TemplateApi implementation
 	public Template getTemplate(final Long templateId) {

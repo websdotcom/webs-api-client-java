@@ -27,4 +27,12 @@ public interface SiteApi {
 	 * properties set
 	 */
 	public void updateSite(final Site site);
+
+
+	/**
+	 * Delete the given site.  This requires "deletesites" scope.
+	 *
+	 * @param siteId	The unique ID of the site
+	 */
+	public void deleteSite(final SiteId siteId);
 }

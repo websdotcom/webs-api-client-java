@@ -50,4 +50,9 @@ public class SiteApiImpl extends AbstractHttpApiClientAware implements SiteApi {
 
 		httpApiClient.httpRequest(put, HttpStatus.SC_NO_CONTENT);
 	}
+
+
+	public void deleteSite(final SiteId siteId) {
+		httpApiClient.httpRequest(new DeleteMethod(httpApiClient.getApiPath() + "sites/" + siteId.toString()));
+	}
 }
